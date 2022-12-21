@@ -3,6 +3,7 @@ Prova Hexagon
 Foi desenvolvido o projeto com arquitetura MVC utilizando DotNet Core 6.0 para o backend e Angular para o FrontEnd.
 
 #BackEnd
+- Minimals API;
 - MVC;
 - Jwt;
 - Migrations;
