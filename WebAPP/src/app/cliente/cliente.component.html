@@ -1,0 +1,171 @@
+<nav class="navbar navbar-expand-lg navbar navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">CRUD de Clientes</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" routerLink="/">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" (click)="logOut()">Logout</a>
+      </li>
+      <li *ngIf="!isUserAuthenticated()" class="nav-item active">
+        <a class="nav-link" routerLink="/cliente">Clientes</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+
+
+<form class="form-horizontal" [formGroup]="clienteForm">
+    <h3 style="text-align: center;">Prova Hexagon Angular - Api JWT</h3>
+    <div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="pwd">Nome:</label>
+        <div class="col-sm-10">
+          <input type="text" [ngClass]="{ 'is-invalid': submitted && f.Nome.errors }" class="form-control" id="txtNome" formControlName="Nome"
+                 placeholder="Insira seu nome">
+
+          <div *ngIf="submitted && f.Nome.errors" class="invalid-feedback">
+            <div *ngIf="f.Nome.errors.required">O Nome não pode ser em branco.</div>
+          </div>
+
+          </div>
+        </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="pwd">Idade:</label>
+        <div class="col-sm-10">
+          <input type="number" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.Idade.errors }" id="txtIdade" formControlName="Idade" placeholder="Informe sua idade">
+          <div *ngIf="submitted && f.Idade.errors" class="invalid-feedback">
+            <div *ngIf="f.Idade.errors.required">A Idade não pode ser em branco.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="pwd">Cpf:</label>
+        <div class="col-sm-10">
+          <input type="text" mask="000.000.000-00" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.Cpf.errors }" id="txtCpf" formControlName="Cpf" placeholder="Informe seu Cpf">
+          <div *ngIf="submitted && f.Cpf.errors" class="invalid-feedback">
+            <div *ngIf="f.Cpf.errors.required">O Cpf não ser pode em branco.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="pwd">Estado:</label>
+        <div class="col-sm-10">
+
+          <select class='select-option'  formControlName="EstadoId" [ngClass]="{ 'is-invalid': submitted && f.EstadoId.errors }"
+                  #estadoSelect
+                  (change)='fillCidadeByEstado(estadoSelect.value)'>
+            <option value="">- Selecione o Estado -</option>
+            <option class='option'
+                    *ngFor='let cli of EstadoList | async;'
+                    [value]="cli.estadoId">
+              {{cli.nome}}
+            </option>
+          </select>
+
+          <div *ngIf="submitted && f.EstadoId.errors" class="invalid-feedback">
+            <div *ngIf="f.EstadoId.errors.required">O Estado não ser pode em branco.</div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="pwd">Cidade:</label>
+        <div class="col-sm-10">
+
+          <select ngModel [ngClass]="{ 'is-invalid': submitted && f.CidadeId.errors }" id="txtCidade" formControlName="CidadeId">
+            <option value="">- Selecione a Cidade -</option>
+            <option value="{{cli.cidadeId}}" *ngFor="let cli of CidadeList | async;">{{cli.nome}}</option>
+          </select>
+
+          <div *ngIf="submitted && f.CidadeId.errors" class="invalid-feedback">
+            <div *ngIf="f.CidadeId.errors.required">A Cidade não ser pode em branco.</div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="pwd">Estado Civil:</label>
+        <div class="col-sm-10">
+          <select ngModel [ngClass]="{ 'is-invalid': submitted && f.EstadoCivilId.errors }" id="txtEstadoCivil" formControlName="EstadoCivilId">
+            <option value="">- Selecione o Estado Civil -</option>
+            <option value="{{cli.estadoCivilId}}" *ngFor="let cli of EstadoCivilList | async;">{{cli.nome}}</option>
+          </select>
+
+
+          <div *ngIf="submitted && f.EstadoCivilId.errors" class="invalid-feedback">
+            <div *ngIf="f.EstadoCivilId.errors.required">O Estado Civil não ser pode em branco.</div>
+          </div>
+        </div>
+
+
+      </div>
+      <br />
+      <div class="form-group">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm">
+              <button type="submit" class="btn btn-primary" *ngIf="showAdd" (click)="PostCliente(clienteForm.value)">Cadastrar</button>
+            </div>
+            <div class="col-sm">
+              <button type="submit" class="btn btn-primary" *ngIf="showEdit" (click)="UpdateClientes(clienteForm.value)">Editar</button>
+            </div>
+            <div class="col-sm">
+              <button type="submit" class="btn btn-primary" (click)="Clear(clienteForm.value)">Limpar</button>
+            </div>
+          </div>
+        </div>
+        <br />
+      </div>
+      <div>
+        <div class="alert alert-success" style="text-align: center;"><b>Lista de Clientes</b></div>
+        <div class="table-responsive" style="text-align: center;">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nome</th>
+                <th scope="col">Idade</th>
+                <th scope="col">Cpf</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Cidade</th>
+                <th scope="col">Estado Civil</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cli of ClienteList | async  paginate: { itemsPerPage: 10, currentPage: actualPage }; let i = index">
+                <th scope="row">{{ i }}</th>
+                <td>{{cli.nome}}</td>
+                <td>{{cli.idade}}</td>
+                <td>{{cli.cpf}}</td>
+                <td>{{cli.estado}}</td>
+                <td>{{cli.cidade}}</td>
+                <td>{{cli.estadoCivil}}</td>
+                <td>
+                  <button type="button" class="btn1" matTooltip="Clique para Editar" (click)='clientesDetailsToEdit(cli.clienteId)'>Editar</button>
+                  <button type="button" class="btn1" matTooltip="Clique para Deletar" (click)="DeleteClientes(cli.clienteId)">Excluir</button>
+                </td>
+              </tr>
+            </tbody>
+            <pagination-controls (pageChange)="actualPage = $event" previousLabel="Anterior" nextLabel="Próximo"></pagination-controls>
+
+          </table>
+          
+
+        </div>
+      </div>
+    </div>
+  </form>
